@@ -10,10 +10,10 @@
 
 .board {
   display: flex;
-  flex-flow: column wrap;
+  flex-wrap: wrap;
   width: 640px;
   height: 640px;
-  background-color: darkgreen;
+  background-color: green;
 }
 
 .cell {
