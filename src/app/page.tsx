@@ -30,26 +30,20 @@ export default function Home() {
     console.log(x, y);
     const newBoard = structuredClone(board);
     for (let i = 0; i < directions.length; i++) {
-      const dy = y + directions[i][0]; //クリックした値から調べるますの位置
-      const dx = x + directions[i][1];
-      if (
-        dy > 7 ||
-        (dy - y) * 2 > 7 ||
-        dy > 7 ||
-        (dy - y) * 2 < 0 ||
-        dx > 7 ||
-        (dx - x) * 2 > 7 ||
-        dx > 7 ||
-        (dx - x) * 2 < 0
-      ) {
-        return;
+      const dy = directions[i][0];
+      const dx = directions[i][1];
+      if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
+        console.log(dx + x);
+        console.log(dy + y);
+        console.log('return');
+        continue;
       } else if (
-        board[dy][dx] === 3 - turnColor &&
-        board[(dy - y) * 2][(dx - x) * 2] === turnColor
+        board[dy + y][dx + x] === 3 - turnColor &&
+        board[dy * 2 + y][dx * 2 + x] === turnColor
       ) {
         newBoard[y][x] = turnColor;
         setTurnColor(3 - turnColor);
-        newBoard[dy][dx] = turnColor;
+        newBoard[dy + y][dx + x] = turnColor;
       }
     }
     setBoard(newBoard);
