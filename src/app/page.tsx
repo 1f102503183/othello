@@ -29,22 +29,24 @@ export default function Home() {
     console.log(turnColor);
     console.log(x, y);
     const newBoard = structuredClone(board);
-    for (let i = 0; i < directions.length; i++) {
-      const dy = directions[i][0];
-      const dx = directions[i][1];
-      if (newBoard[y][x] === 0) {
+    if (newBoard[y][x] === 0) {
+      for (let i = 0; i < directions.length; i++) {
+        const dy = directions[i][0];
+        const dx = directions[i][1];
         if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
           console.log(dx + x);
           console.log(dy + y);
           console.log('return');
           continue;
-        } else if (board[dy + y][dx + x] === 3 - turnColor) {
-          if (board[dy * 2 + y][dx * 2 + x] === turnColor) {
-            newBoard[y][x] = turnColor;
-            setTurnColor(3 - turnColor);
-            newBoard[dy + y][dx + x] = turnColor;
-          }
+        } else if (
+          board[dy + y][dx + x] === 3 - turnColor &&
+          board[dy * 2 + y][dx * 2 + x] === turnColor
+        ) {
+          newBoard[y][x] = turnColor;
+          setTurnColor(3 - turnColor);
+          newBoard[dy + y][dx + x] = turnColor;
         }
+        console.log('check for count', i);
       }
     }
     setBoard(newBoard);
