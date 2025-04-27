@@ -39,14 +39,24 @@ export default function Home() {
           console.log('return');
           continue;
         } else if (board[dy + y][dx + x] === 3 - turnColor) {
-          //ここにforかwhileをいれる。
-          if (board[dy * 2 + y][dx * 2 + x] === turnColor) {
-            newBoard[y][x] = turnColor;
-            setTurnColor(3 - turnColor);
-            newBoard[dy + y][dx + x] = turnColor;
+          console.log('next is other');
+          for (
+            let j = 2;
+            dy * j + y < 7 && dy * j + y > 0 && dx * j + x < 7 && dx * j + x > 0;
+            j++
+          ) {
+            console.log('enough=>for');
+            if (board[dy * j + y][dx * j + x] === turnColor) {
+              newBoard[y][x] = turnColor;
+              setTurnColor(3 - turnColor);
+              for (let k = j; k > 0; k--) {
+                newBoard[dy * k + y][dx * k + x] = turnColor;
+              }
+              console.log('turn');
+              break;
+            }
           }
         }
-        console.log('check for count', i);
       }
     }
     setBoard(newBoard);
