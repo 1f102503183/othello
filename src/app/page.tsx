@@ -38,13 +38,13 @@ export default function Home() {
           console.log(dy + y);
           console.log('return');
           continue;
-        } else if (
-          board[dy + y][dx + x] === 3 - turnColor &&
-          board[dy * 2 + y][dx * 2 + x] === turnColor
-        ) {
-          newBoard[y][x] = turnColor;
-          setTurnColor(3 - turnColor);
-          newBoard[dy + y][dx + x] = turnColor;
+        } else if (board[dy + y][dx + x] === 3 - turnColor) {
+          //ここにforかwhileをいれる。
+          if (board[dy * 2 + y][dx * 2 + x] === turnColor) {
+            newBoard[y][x] = turnColor;
+            setTurnColor(3 - turnColor);
+            newBoard[dy + y][dx + x] = turnColor;
+          }
         }
         console.log('check for count', i);
       }
