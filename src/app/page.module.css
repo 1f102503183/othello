@@ -8,6 +8,14 @@
   padding: 0 0.5rem;
 }
 
+.counter {
+  display: flex;
+  width: 160px;
+  height: 80px;
+  background-color: #000;
+  border-radius: 15%;
+}
+
 .board {
   display: flex;
   flex-wrap: wrap;
@@ -24,6 +32,13 @@
   width: 80px;
   height: 80px;
   border: 3px solid #000;
+}
+
+.expectPoint {
+  width: 40px;
+  height: 40px;
+  background-color: #888;
+  border-radius: 50%;
 }
 
 .stone {
