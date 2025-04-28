@@ -4,7 +4,9 @@ import { useState } from 'react';
 import styles from './page.module.css';
 
 export default function Home() {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [turnColor, setTurnColor] = useState(1);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [board, setBoard] = useState([
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -36,6 +38,7 @@ export default function Home() {
   for (let a = 0; a < 8; a++) {
     for (let b = 0; b < 8; b++) {
       // y = a  x = b
+      //ここから下を関数にする
       if (board[a][b] === 0 || newBoard[a][b] === 3) {
         for (let i = 0; i < directions.length; i++) {
           const dy = directions[i][0];
@@ -65,19 +68,13 @@ export default function Home() {
   }
 
   const clickhandler = (x: number, y: number) => {
-    console.log(turnColor);
-    console.log(x, y);
     if (newBoard[y][x] === 0 || newBoard[y][x] === 3) {
       for (let i = 0; i < directions.length; i++) {
         const dy = directions[i][0];
         const dx = directions[i][1];
         if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
-          console.log(dx + x);
-          console.log(dy + y);
-          console.log('contenue');
           continue;
         } else if (board[dy + y][dx + x] === 3 - turnColor) {
-          console.log('next is other');
           for (
             let j = 2;
             dy * j + y <= 7 &&
@@ -88,14 +85,13 @@ export default function Home() {
             board[dy * j + y][dx * j + x] !== 3;
             j++
           ) {
-            console.log('enough=>for dy,dx = ', dy * j, dx * x);
             if (board[dy * j + y][dx * j + x] === turnColor) {
+              //裏返す
               newBoard[y][x] = turnColor;
               setTurnColor(3 - turnColor);
               for (let k = j; k > 0; k--) {
                 newBoard[dy * k + y][dx * k + x] = turnColor;
               }
-              console.log('turn');
               break;
             }
           }
@@ -118,7 +114,12 @@ export default function Home() {
                   style={{ background: color === 1 ? '#000' : '#fff' }}
                 />
               )}
-              {color === 3 && <div className={styles.expectPoint} />}
+              {color === 3 && (
+                <div
+                  className={styles.expectPoint}
+                  style={{ border: turnColor === 1 ? '5px dotted #000' : '5px dotted #fff' }}
+                />
+              )}
             </div>
           )),
         )}
