@@ -66,12 +66,7 @@ export default function Home() {
   };
 
   const newBoard = structuredClone(board);
-  //候補地消し
-  for (let a = 0; a < 8; a++) {
-    for (let b = 0; b < 8; b++) {
-      board[a][b] %= 3;
-    }
-  }
+
   //候補地探し
   for (let a = 0; a < 8; a++) {
     for (let b = 0; b < 8; b++) {
@@ -81,6 +76,12 @@ export default function Home() {
 
   const clickhandler = (x: number, y: number) => {
     Serch_or_Turn(y, x);
+    //候補地消し
+    for (let a = 0; a < 8; a++) {
+      for (let b = 0; b < 8; b++) {
+        board[a][b] %= 3;
+      }
+    }
     setBoard(newBoard);
   };
   return (
