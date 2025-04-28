@@ -36,20 +36,20 @@ export default function Home() {
         if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
           console.log(dx + x);
           console.log(dy + y);
-          console.log('return');
+          console.log('contenue');
           continue;
         } else if (board[dy + y][dx + x] === 3 - turnColor) {
           console.log('next is other');
           for (
             let j = 2;
-            dy * j + y < 7 &&
-            dy * j + y > 0 &&
-            dx * j + x < 7 &&
-            dx * j + x > 0 &&
+            dy * j + y <= 7 &&
+            dy * j + y >= 0 &&
+            dx * j + x <= 7 &&
+            dx * j + x >= 0 &&
             board[dy * j + y][dx * j + x] !== 0;
             j++
           ) {
-            console.log('enough=>for');
+            console.log('enough=>for dy,dx = ', dy * j, dx * x);
             if (board[dy * j + y][dx * j + x] === turnColor) {
               newBoard[y][x] = turnColor;
               setTurnColor(3 - turnColor);
