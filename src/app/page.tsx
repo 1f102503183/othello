@@ -42,7 +42,11 @@ export default function Home() {
           console.log('next is other');
           for (
             let j = 2;
-            dy * j + y < 7 && dy * j + y > 0 && dx * j + x < 7 && dx * j + x > 0;
+            dy * j + y < 7 &&
+            dy * j + y > 0 &&
+            dx * j + x < 7 &&
+            dx * j + x > 0 &&
+            board[dy * j + y][dx * j + x] !== 0;
             j++
           ) {
             console.log('enough=>for');
