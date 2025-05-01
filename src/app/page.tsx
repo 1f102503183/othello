@@ -65,6 +65,8 @@ export default function Home() {
     }
   };
 
+  const turn_count: number = 60 - board.flat().filter((board) => board === 0).length;
+
   //駒カウンター
   const counter = (c: number) => {
     return newBoard.flat().filter((newBoard) => newBoard === c).length;
@@ -73,7 +75,6 @@ export default function Home() {
   const newBoard = structuredClone(board);
 
   //候補地探し
-
   for (let a = 0; a < 8; a++) {
     for (let b = 0; b < 8; b++) {
       Serch_or_Turn(a, b);
@@ -81,17 +82,18 @@ export default function Home() {
   }
 
   const clickhandler = (x: number, y: number) => {
-    console.log([y][x]);
-    Serch_or_Turn(y, x);
+    console.log(newBoard);
+    console.log(board);
+    console.log(JSON.stringify(board) !== JSON.stringify(newBoard));
     if (JSON.stringify(board) !== JSON.stringify(newBoard)) {
-      //候補地消し
-      for (let a = 0; a < 8; a++) {
-        for (let b = 0; b < 8; b++) {
-          newBoard[a][b] %= 3;
-        }
-      }
       setTurnColor(3 - turnColor);
-      console.log(newBoard);
+    }
+    Serch_or_Turn(y, x);
+    //候補地消し
+    for (let a = 0; a < 8; a++) {
+      for (let b = 0; b < 8; b++) {
+        newBoard[a][b] %= 3;
+      }
     }
     setBoard(newBoard);
   };
@@ -103,7 +105,7 @@ export default function Home() {
         className={styles.counter}
         style={{ border: turnColor === 1 ? '3px solid #000' : '3px solid #fff' }}
       >
-        white:{counter(2)} black:{counter(1)}
+        white:{counter(2)} black:{counter(1)} {turn_count}turn
       </div>
       <div className={styles.board}>
         {newBoard.map((row, y) =>
