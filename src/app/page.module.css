@@ -6,14 +6,13 @@
   height: 100vh;
   min-height: 100vh;
   padding: 0 0.5rem;
+  background-color: #888;
 }
 
 .counter {
   display: flex;
   width: 160px;
   height: 80px;
-  background-color: #000;
-  border-radius: 15%;
 }
 
 .board {
