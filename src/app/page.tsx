@@ -13,7 +13,7 @@ export default function Home() {
     [0, 0, 0, 2, 1, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 3, 0],
   ]);
   const directions = [
     [-1, -1],
@@ -28,7 +28,7 @@ export default function Home() {
 
   const numberOfTurn = 60 - counter(0, board) + 1;
   const history: number[][][] = [];
-  console.log(64 - counter(0, board));
+
   const clickhandler = (x: number, y: number) => {
     let newBoard = structuredClone(board);
     //↑変更はすべてこのnewBoardへ
@@ -36,12 +36,21 @@ export default function Home() {
     //↓候補地探し
     for (let b = 0; b < 8; b++) {
       for (let a = 0; a < 8; a++) {
-        expect(b, a, newBoard, directions, turnColor);
+        if (expect(b, a, board, directions, turnColor)) {
+          newBoard[b][a] = 3;
+        }
       }
     }
+
     console.log(newBoard);
     if (board[y][x] === 0 || board[y][x] === 3) {
       Put(y, x, newBoard, directions, turnColor);
+      //↓候補地探し
+      for (let b = 0; b < 8; b++) {
+        for (let a = 0; a < 8; a++) {
+          newBoard[b][a] %= 3;
+        }
+      }
     }
 
     //定義されていないとこなら履歴にしようとした
@@ -74,7 +83,7 @@ export default function Home() {
         {board.map((row, y) =>
           row.map((color, x) => (
             <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickhandler(x, y)}>
-              {color !== 0 && (
+              {color % 3 !== 0 && (
                 <div
                   className={styles.stone}
                   style={{ background: color === 1 ? '#000' : '#fff' }}
@@ -102,7 +111,6 @@ function Put(y: number, x: number, board: number[][], directions: number[][], tu
     if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
       continue;
     } else if (board[dy + y][dx + x] === 3 - turnColor) {
-      console.log('next is other');
       for (
         let j = 2;
         dy * j + y <= 7 &&
@@ -139,7 +147,6 @@ function expect(
     if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
       continue;
     } else if (board[dy + y][dx + x] === 3 - turnColor) {
-      console.log('next is other');
       for (
         let j = 2;
         dy * j + y <= 7 &&
@@ -150,8 +157,7 @@ function expect(
         j++
       ) {
         if (board[dy * j + y][dx * j + x] === turnColor) {
-          board[y][x] = 3;
-          return;
+          return true;
         }
       }
     }
