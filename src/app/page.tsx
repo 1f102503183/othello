@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import styles from './page.module.css';
 //board,newBoardへの書き込みはすべて
+
 export default function Home() {
   const [turnColor, setTurnColor] = useState(1);
   const [board, setBoard] = useState([
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 2, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0],
     [0, 0, 0, 2, 1, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
@@ -30,25 +31,42 @@ export default function Home() {
   const history: number[][][] = [];
 
   const clickhandler = (x: number, y: number) => {
-    let newBoard = structuredClone(board);
-    //↑変更はすべてこのnewBoardへ
-
-    //↓候補地探し
-    for (let b = 0; b < 8; b++) {
-      for (let a = 0; a < 8; a++) {
-        if (expect(b, a, board, directions, turnColor)) {
-          newBoard[b][a] = 3;
+    let canPutPoint = 0;
+    for (let a = 0; a < 8; a++) {
+      for (let b = 0; b < 8; b++) {
+        if (canPut(a, b, board, directions, turnColor)) {
+          canPutPoint += 1;
         }
       }
     }
-
-    console.log(newBoard);
-    if (board[y][x] === 0 || board[y][x] === 3) {
-      Put(y, x, newBoard, directions, turnColor);
-      //↓候補地探し
-      for (let b = 0; b < 8; b++) {
-        for (let a = 0; a < 8; a++) {
-          newBoard[b][a] %= 3;
+    let newBoard = structuredClone(board);
+    //↑変更はすべてこのnewBoardへ
+    //置く
+    if (board[y][x] === 0) {
+      for (let i = 0; i < directions.length; i++) {
+        const dy = directions[i][0];
+        const dx = directions[i][1];
+        if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
+          continue;
+        } else if (board[dy + y][dx + x] === 3 - turnColor) {
+          for (
+            let j = 2;
+            dy * j + y <= 7 &&
+            dy * j + y >= 0 &&
+            dx * j + x <= 7 &&
+            dx * j + x >= 0 &&
+            board[dy * j + y][dx * j + x] !== 0;
+            j++
+          ) {
+            if (board[dy * j + y][dx * j + x] === turnColor) {
+              //戻りながら裏返していく処理
+              newBoard[y][x] = turnColor;
+              for (let k = j; k > 0; k--) {
+                newBoard[dy * k + y][dx * k + x] = turnColor;
+              }
+              break;
+            }
+          }
         }
       }
     }
@@ -58,16 +76,19 @@ export default function Home() {
       newBoard = history[numberOfTurn];
     }
 
+    console.log(canPutPoint);
+
     setBoard(newBoard);
     if (JSON.stringify(board) !== JSON.stringify(newBoard)) {
       setTurnColor(3 - turnColor);
       history[numberOfTurn] = board;
     }
+    if (counter(0, board) === 0 || canPutPoint === 0) {
+      alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
+      return;
+    }
   };
-  if (counter(0, board) === 0) {
-    alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
-    return;
-  }
+
   return (
     <div className={styles.container}>
       <div
@@ -103,38 +124,8 @@ export default function Home() {
   );
 }
 
-//おく関数
-function Put(y: number, x: number, board: number[][], directions: number[][], turnColor: number) {
-  for (let i = 0; i < directions.length; i++) {
-    const dy = directions[i][0];
-    const dx = directions[i][1];
-    if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
-      continue;
-    } else if (board[dy + y][dx + x] === 3 - turnColor) {
-      for (
-        let j = 2;
-        dy * j + y <= 7 &&
-        dy * j + y >= 0 &&
-        dx * j + x <= 7 &&
-        dx * j + x >= 0 &&
-        board[dy * j + y][dx * j + x] !== 0;
-        j++
-      ) {
-        if (board[dy * j + y][dx * j + x] === turnColor) {
-          //戻りながら裏返していく処理
-          board[y][x] = turnColor;
-          for (let k = j; k > 0; k--) {
-            board[dy * k + y][dx * k + x] = turnColor;
-          }
-          break;
-        }
-      }
-    }
-  }
-}
-
-//候補地を作る関数
-function expect(
+//置けるかどうかを調べる関数
+function canPut(
   y: number,
   x: number,
   board: number[][],
@@ -159,6 +150,7 @@ function expect(
         if (board[dy * j + y][dx * j + x] === turnColor) {
           return true;
         }
+        return false;
       }
     }
   }
