@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import styles from './page.module.css';
-
+//board,newBoardへの書き込みはすべて
 export default function Home() {
   const [turnColor, setTurnColor] = useState(1);
   const [board, setBoard] = useState([
@@ -15,20 +15,52 @@ export default function Home() {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
+  const directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
+
+  const numberOfTurn = 60 - counter(0, board);
 
   const clickhandler = (x: number, y: number) => {
     const newBoard = structuredClone(board);
+    //↑変更はすべてこのnewBoardへ
     if (board[y][x] === 0) {
-      CanPut(y, x, newBoard, turnColor);
+      CanPut(y, x, newBoard, directions, turnColor);
     }
     if (JSON.stringify(board) !== JSON.stringify(newBoard)) {
+      //条件を満たしたらかってにうらかえる処理
+      for (let a = 0; a < 8; a++) {
+        for (let b = 0; b < 8; b++) {
+          break;
+        }
+      }
       setTurnColor(3 - turnColor);
       setBoard(newBoard);
+      const log = JSON.stringify(board);
     }
   };
-
+  if (counter(0, board) === 0) {
+    alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
+    return;
+  }
   return (
     <div className={styles.container}>
+      <div
+        className={styles.counterWindow}
+        style={{
+          background: turnColor === 1 ? '#000' : '#fff',
+          color: turnColor === 1 ? '#fff' : '#000',
+        }}
+      >
+        black:{counter(1, board)} white:{counter(2, board)} {numberOfTurn}turn
+      </div>
       <div className={styles.board}>
         {board.map((row, y) =>
           row.map((color, x) => (
@@ -47,18 +79,14 @@ export default function Home() {
   );
 }
 
-//おけるか調べる関数
-function CanPut(y: number, x: number, board: number[][], turnColor: number) {
-  const directions = [
-    [-1, -1],
-    [-1, 0],
-    [-1, 1],
-    [0, -1],
-    [0, 1],
-    [1, -1],
-    [1, 0],
-    [1, 1],
-  ];
+//おけるか調べる関数にしたい
+function CanPut(
+  y: number,
+  x: number,
+  board: number[][],
+  directions: number[][],
+  turnColor: number,
+) {
   for (let i = 0; i < directions.length; i++) {
     const dy = directions[i][0];
     const dx = directions[i][1];
@@ -88,3 +116,7 @@ function CanPut(y: number, x: number, board: number[][], turnColor: number) {
     }
   }
 }
+//駒カウンター
+const counter = (c: number, board: number[][]) => {
+  return board.flat().filter((i) => i === c).length;
+};
