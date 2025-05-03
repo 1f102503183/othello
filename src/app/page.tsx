@@ -18,17 +18,13 @@ export default function Home() {
 
   const clickhandler = (x: number, y: number) => {
     const newBoard = structuredClone(board);
-    if (CanPut(y, x, board, turnColor)) {
-      //戻りながら裏返していく処理
-      /*board[y][x] = turnColor;
-      for (let k = j; k > 0; k--) {
-        board[dy * k + y][dx * k + x] = turnColor;
-      }
-      console.log('turn');
-      break;*/
+    if (board[y][x] === 0) {
+      CanPut(y, x, newBoard, turnColor);
     }
-    setTurnColor(3 - turnColor);
-    setBoard(newBoard);
+    if (JSON.stringify(board) !== JSON.stringify(newBoard)) {
+      setTurnColor(3 - turnColor);
+      setBoard(newBoard);
+    }
   };
 
   return (
@@ -63,30 +59,30 @@ function CanPut(y: number, x: number, board: number[][], turnColor: number) {
     [1, 0],
     [1, 1],
   ];
-  if (board[y][x] === 0) {
-    for (let i = 0; i < directions.length; i++) {
-      const dy = directions[i][0];
-      const dx = directions[i][1];
-      if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
-        console.log(dx + x);
-        console.log(dy + y);
-        console.log('contenue');
-        continue;
-      } else if (board[dy + y][dx + x] === 3 - turnColor) {
-        console.log('next is other');
-        for (
-          let j = 2;
-          dy * j + y <= 7 &&
-          dy * j + y >= 0 &&
-          dx * j + x <= 7 &&
-          dx * j + x >= 0 &&
-          board[dy * j + y][dx * j + x] !== 0;
-          j++
-        ) {
-          if (board[dy * j + y][dx * j + x] === turnColor) {
-            return true;
+  for (let i = 0; i < directions.length; i++) {
+    const dy = directions[i][0];
+    const dx = directions[i][1];
+    if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
+      continue;
+    } else if (board[dy + y][dx + x] === 3 - turnColor) {
+      console.log('next is other');
+      for (
+        let j = 2;
+        dy * j + y <= 7 &&
+        dy * j + y >= 0 &&
+        dx * j + x <= 7 &&
+        dx * j + x >= 0 &&
+        board[dy * j + y][dx * j + x] !== 0;
+        j++
+      ) {
+        if (board[dy * j + y][dx * j + x] === turnColor) {
+          //戻りながら裏返していく処理
+          board[y][x] = turnColor;
+          for (let k = j; k > 0; k--) {
+            board[dy * k + y][dx * k + x] = turnColor;
           }
-          return false;
+          console.log('turn');
+          break;
         }
       }
     }
