@@ -33,6 +33,12 @@
   border: 3px solid #000;
 }
 
+.expectpoint {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+}
+
 .stone {
   width: 56px;
   height: 56px;

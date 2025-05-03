@@ -26,24 +26,33 @@ export default function Home() {
     [1, 1],
   ];
 
-  const numberOfTurn = 60 - counter(0, board);
-
+  const numberOfTurn = 60 - counter(0, board) + 1;
+  const history: number[][][] = [];
+  console.log(64 - counter(0, board));
   const clickhandler = (x: number, y: number) => {
-    const newBoard = structuredClone(board);
+    let newBoard = structuredClone(board);
     //↑変更はすべてこのnewBoardへ
-    if (board[y][x] === 0) {
-      CanPut(y, x, newBoard, directions, turnColor);
-    }
-    if (JSON.stringify(board) !== JSON.stringify(newBoard)) {
-      //条件を満たしたらかってにうらかえる処理
+
+    //↓候補地探し
+    for (let b = 0; b < 8; b++) {
       for (let a = 0; a < 8; a++) {
-        for (let b = 0; b < 8; b++) {
-          break;
-        }
+        expect(b, a, newBoard, directions, turnColor);
       }
+    }
+    console.log(newBoard);
+    if (board[y][x] === 0 || board[y][x] === 3) {
+      Put(y, x, newBoard, directions, turnColor);
+    }
+
+    //定義されていないとこなら履歴にしようとした
+    if (board[y][x] === undefined) {
+      newBoard = history[numberOfTurn];
+    }
+
+    setBoard(newBoard);
+    if (JSON.stringify(board) !== JSON.stringify(newBoard)) {
       setTurnColor(3 - turnColor);
-      setBoard(newBoard);
-      const log = JSON.stringify(board);
+      history[numberOfTurn] = board;
     }
   };
   if (counter(0, board) === 0) {
@@ -71,6 +80,12 @@ export default function Home() {
                   style={{ background: color === 1 ? '#000' : '#fff' }}
                 />
               )}
+              {color === 3 && (
+                <div
+                  className={styles.expectpoint}
+                  style={{ border: turnColor === 1 ? '5px dotted #000' : '5px dotted #fff' }}
+                />
+              )}
             </div>
           )),
         )}
@@ -79,8 +94,39 @@ export default function Home() {
   );
 }
 
-//おけるか調べる関数にしたい
-function CanPut(
+//おく関数
+function Put(y: number, x: number, board: number[][], directions: number[][], turnColor: number) {
+  for (let i = 0; i < directions.length; i++) {
+    const dy = directions[i][0];
+    const dx = directions[i][1];
+    if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
+      continue;
+    } else if (board[dy + y][dx + x] === 3 - turnColor) {
+      console.log('next is other');
+      for (
+        let j = 2;
+        dy * j + y <= 7 &&
+        dy * j + y >= 0 &&
+        dx * j + x <= 7 &&
+        dx * j + x >= 0 &&
+        board[dy * j + y][dx * j + x] !== 0;
+        j++
+      ) {
+        if (board[dy * j + y][dx * j + x] === turnColor) {
+          //戻りながら裏返していく処理
+          board[y][x] = turnColor;
+          for (let k = j; k > 0; k--) {
+            board[dy * k + y][dx * k + x] = turnColor;
+          }
+          break;
+        }
+      }
+    }
+  }
+}
+
+//候補地を作る関数
+function expect(
   y: number,
   x: number,
   board: number[][],
@@ -104,18 +150,14 @@ function CanPut(
         j++
       ) {
         if (board[dy * j + y][dx * j + x] === turnColor) {
-          //戻りながら裏返していく処理
-          board[y][x] = turnColor;
-          for (let k = j; k > 0; k--) {
-            board[dy * k + y][dx * k + x] = turnColor;
-          }
-          console.log('turn');
-          break;
+          board[y][x] = 3;
+          return;
         }
       }
     }
   }
 }
+
 //駒カウンター
 const counter = (c: number, board: number[][]) => {
   return board.flat().filter((i) => i === c).length;
