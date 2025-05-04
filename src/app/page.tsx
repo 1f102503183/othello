@@ -9,10 +9,10 @@ export default function Home() {
   const [board, setBoard] = useState([
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 2, 0, 0, 0],
-    [0, 0, 0, 2, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 3, 0, 0, 0],
+    [0, 0, 0, 1, 2, 3, 0, 0],
+    [0, 0, 3, 2, 1, 0, 0, 0],
+    [0, 0, 0, 3, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
@@ -33,6 +33,8 @@ export default function Home() {
 
   const clickhandler = (x: number, y: number) => {
     let newBoard = structuredClone(board);
+    const nextTurnColor = 3 - turnColor;
+
     //現在の候補地の削除
     for (let a = 0; a < 8; a++) {
       for (let b = 0; b < 8; b++) {
@@ -42,7 +44,6 @@ export default function Home() {
 
     //置く
     if (board[y][x] === 3 || board[y][x] === 0) {
-      console.log('canput');
       for (let i = 0; i < directions.length; i++) {
         const dy = directions[i][0];
         const dx = directions[i][1];
@@ -78,11 +79,10 @@ export default function Home() {
       newBoard = history[numberOfTurn];
     }
 
+    //終了判定
     if (counter(0, board) + counter(3, board) === 0) {
       alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
     }
-
-    const nextTurnColor = 3 - turnColor;
 
     if (counter(1, board) + counter(2, board) !== counter(1, newBoard) + counter(2, newBoard)) {
       //候補地差がし
@@ -93,8 +93,37 @@ export default function Home() {
           }
         }
       }
-      setBoard(newBoard);
+      console.log(newBoard);
+
+      if (counter(3, newBoard) === 0) {
+        let point = 0;
+        for (let a = 0; a < 8; a++) {
+          for (let b = 0; b < 8; b++) {
+            if (canPut(a, b, newBoard, directions, turnColor)) {
+              point += 1;
+            }
+          }
+        }
+        if (point === 0) {
+          alert(
+            `互いに置くことができないため, ${counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです'}`,
+          );
+          setBoard(newBoard);
+          return;
+        }
+        for (let a = 0; a < 8; a++) {
+          for (let b = 0; b < 8; b++) {
+            if (canPut(a, b, newBoard, directions, turnColor)) {
+              newBoard[a][b] = 3;
+            }
+          }
+        }
+        setBoard(newBoard);
+        alert(nextTurnColor === 1 ? '黒は置けないためパスします' : '白は置けないためパスします');
+        return;
+      }
       setTurnColor(3 - turnColor);
+      setBoard(newBoard);
       history[numberOfTurn] = board;
     }
     //ここまではレンダーされない?
