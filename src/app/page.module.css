@@ -9,10 +9,10 @@
   background-color: #888;
 }
 
-.counter {
-  display: flex;
-  width: 160px;
+.counterWindow {
+  width: 640px;
   height: 80px;
+  background-color: #000;
 }
 
 .board {
@@ -33,10 +33,9 @@
   border: 3px solid #000;
 }
 
-.expectPoint {
+.expectpoint {
   width: 56px;
   height: 56px;
-  border: 5px dotted #000;
   border-radius: 50%;
 }
 
