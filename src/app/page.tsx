@@ -10,12 +10,13 @@ export default function Home() {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0],
+    [0, 0, 0, 1, 2, 0, 0, 0],
     [0, 0, 0, 2, 1, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 3, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
+  //ここから下がレンダー直後に実行される
   const directions = [
     [-1, -1],
     [-1, 0],
@@ -31,18 +32,17 @@ export default function Home() {
   const history: number[][][] = [];
 
   const clickhandler = (x: number, y: number) => {
-    let canPutPoint = 0;
+    let newBoard = structuredClone(board);
+    //現在の候補地の削除
     for (let a = 0; a < 8; a++) {
       for (let b = 0; b < 8; b++) {
-        if (canPut(a, b, board, directions, turnColor)) {
-          canPutPoint += 1;
-        }
+        newBoard[a][b] %= 3;
       }
     }
-    let newBoard = structuredClone(board);
-    //↑変更はすべてこのnewBoardへ
+
     //置く
-    if (board[y][x] === 0) {
+    if (board[y][x] === 3 || board[y][x] === 0) {
+      console.log('canput');
       for (let i = 0; i < directions.length; i++) {
         const dy = directions[i][0];
         const dx = directions[i][1];
@@ -55,9 +55,11 @@ export default function Home() {
             dy * j + y >= 0 &&
             dx * j + x <= 7 &&
             dx * j + x >= 0 &&
-            board[dy * j + y][dx * j + x] !== 0;
+            board[dy * j + y][dx * j + x] !== 0 &&
+            board[dy * j + y][dx * j + x] !== 3;
             j++
           ) {
+            console.log('enough for');
             if (board[dy * j + y][dx * j + x] === turnColor) {
               //戻りながら裏返していく処理
               newBoard[y][x] = turnColor;
@@ -76,17 +78,26 @@ export default function Home() {
       newBoard = history[numberOfTurn];
     }
 
-    console.log(canPutPoint);
+    if (counter(0, board) + counter(3, board) === 0) {
+      alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
+    }
 
-    setBoard(newBoard);
-    if (JSON.stringify(board) !== JSON.stringify(newBoard)) {
+    const nextTurnColor = 3 - turnColor;
+
+    if (counter(1, board) + counter(2, board) !== counter(1, newBoard) + counter(2, newBoard)) {
+      //候補地差がし
+      for (let a = 0; a < 8; a++) {
+        for (let b = 0; b < 8; b++) {
+          if (canPut(a, b, newBoard, directions, nextTurnColor)) {
+            newBoard[a][b] = 3;
+          }
+        }
+      }
+      setBoard(newBoard);
       setTurnColor(3 - turnColor);
       history[numberOfTurn] = board;
     }
-    if (counter(0, board) === 0 || canPutPoint === 0) {
-      alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
-      return;
-    }
+    //ここまではレンダーされない?
   };
 
   return (
@@ -132,28 +143,31 @@ function canPut(
   directions: number[][],
   turnColor: number,
 ) {
-  for (let i = 0; i < directions.length; i++) {
-    const dy = directions[i][0];
-    const dx = directions[i][1];
-    if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
-      continue;
-    } else if (board[dy + y][dx + x] === 3 - turnColor) {
-      for (
-        let j = 2;
-        dy * j + y <= 7 &&
-        dy * j + y >= 0 &&
-        dx * j + x <= 7 &&
-        dx * j + x >= 0 &&
-        board[dy * j + y][dx * j + x] !== 0;
-        j++
-      ) {
-        if (board[dy * j + y][dx * j + x] === turnColor) {
-          return true;
+  if (board[y][x] === 0 || board[y][x] === 3) {
+    for (let i = 0; i < directions.length; i++) {
+      const dy = directions[i][0];
+      const dx = directions[i][1];
+      if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
+        continue;
+      } else if (board[dy + y][dx + x] === 3 - turnColor) {
+        for (
+          let j = 2;
+          dy * j + y <= 7 &&
+          dy * j + y >= 0 &&
+          dx * j + x <= 7 &&
+          dx * j + x >= 0 &&
+          board[dy * j + y][dx * j + x] !== 0 &&
+          board[dy * j + y][dx * j + x] !== 3;
+          j++
+        ) {
+          if (board[dy * j + y][dx * j + x] === turnColor) {
+            return true;
+          }
         }
-        return false;
       }
     }
   }
+  return false;
 }
 
 //駒カウンター
