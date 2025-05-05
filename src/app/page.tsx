@@ -78,11 +78,6 @@ export default function Home() {
       newBoard = history[numberOfTurn];
     }
 
-    //終了判定
-    if (counter(0, board) + counter(3, board) === 0) {
-      alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
-    }
-
     if (counter(1, board) + counter(2, board) !== counter(1, newBoard) + counter(2, newBoard)) {
       //候補地差がし
       for (let a = 0; a < 8; a++) {
@@ -95,6 +90,12 @@ export default function Home() {
       console.log(newBoard);
 
       if (counter(3, newBoard) === 0) {
+        //終了判定
+        if (counter(0, newBoard) + counter(3, newBoard) === 0) {
+          alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
+          setBoard(newBoard);
+          return;
+        }
         let point = 0;
         for (let a = 0; a < 8; a++) {
           for (let b = 0; b < 8; b++) {
