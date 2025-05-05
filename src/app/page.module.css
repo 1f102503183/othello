@@ -12,6 +12,7 @@
 .counterWindow {
   width: 640px;
   height: 80px;
+  font-size: 56px;
   background-color: #000;
 }
 

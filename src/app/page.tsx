@@ -67,7 +67,6 @@ export default function Home() {
               for (let k = j; k > 0; k--) {
                 newBoard[dy * k + y][dx * k + x] = turnColor;
               }
-
               break;
             }
           }
