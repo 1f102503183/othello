@@ -34,6 +34,7 @@ export default function Home() {
   const clickhandler = (x: number, y: number) => {
     let newBoard = structuredClone(board);
     const nextTurnColor = 3 - turnColor;
+    console.log(history);
 
     //現在の候補地の削除
     for (let a = 0; a < 8; a++) {
@@ -60,7 +61,6 @@ export default function Home() {
             board[dy * j + y][dx * j + x] !== 3;
             j++
           ) {
-            console.log('enough for');
             if (board[dy * j + y][dx * j + x] === turnColor) {
               //戻りながら裏返していく処理
               newBoard[y][x] = turnColor;
@@ -73,9 +73,11 @@ export default function Home() {
         }
       }
     }
-    //定義されていないとこなら履歴にしようとした
+    //履歴からのロード
     if (board[y][x] === undefined) {
-      newBoard = history[numberOfTurn];
+      newBoard = history[numberOfTurn - 1];
+      setBoard(newBoard);
+      return;
     }
 
     if (counter(1, board) + counter(2, board) !== counter(1, newBoard) + counter(2, newBoard)) {
@@ -87,7 +89,6 @@ export default function Home() {
           }
         }
       }
-      console.log(newBoard);
 
       if (counter(3, newBoard) === 0) {
         //終了判定
