@@ -81,29 +81,9 @@ export default function Home() {
           }
         }
       }
-
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       if (counter(3, newBoard) === 0) {
-        //終了判定
-        if (counter(0, newBoard) + counter(3, newBoard) === 0) {
-          alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
-          setBoard(newBoard);
-          return;
-        }
-        let point = 0;
-        for (let a = 0; a < 8; a++) {
-          for (let b = 0; b < 8; b++) {
-            if (canPut(a, b, newBoard, directions, turnColor)) {
-              point += 1;
-            }
-          }
-        }
-        if (point === 0) {
-          alert(
-            `互いに置くことができないため, ${counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです'}`,
-          );
-          setBoard(newBoard);
-          return;
-        }
+        //次の地点の候補地探し
         for (let a = 0; a < 8; a++) {
           for (let b = 0; b < 8; b++) {
             if (canPut(a, b, newBoard, directions, turnColor)) {
@@ -111,10 +91,22 @@ export default function Home() {
             }
           }
         }
+        if (counter(3, newBoard) !== 0) {
+          alert(nextTurnColor === 1 ? '黒は置けないためパスします' : '白は置けないためパスします');
+        } else {
+          //終了判定
+          if (counter(0, newBoard) + counter(3, newBoard) === 0) {
+            alert(counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです');
+          } else {
+            alert(
+              `互いに置くことができないため, ${counter(1, board) > counter(2, board) ? '黒の勝ちです' : '白の勝ちです'}`,
+            );
+          }
+        }
         setBoard(newBoard);
-        alert(nextTurnColor === 1 ? '黒は置けないためパスします' : '白は置けないためパスします');
         return;
       }
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       setTurnColor(3 - turnColor);
       setBoard(newBoard);
     }
