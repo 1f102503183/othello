@@ -9,13 +9,14 @@ export default function Home() {
   const [board, setBoard] = useState([
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 3, 0, 0, 0],
-    [0, 0, 0, 1, 2, 3, 0, 0],
-    [0, 0, 3, 2, 1, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 0, 0, 0],
+    [0, 0, 0, 2, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
+
   //ここから下がレンダー直後に実行される
   const directions = [
     [-1, -1],
@@ -32,7 +33,7 @@ export default function Home() {
 
   const clickhandler = (x: number, y: number) => {
     const newBoard = structuredClone(board);
-    const nextTurnColor = 3 - turnColor;
+    // const nextTurnColor = 3 - turnColor; <= 次のターンカラー
 
     //現在の候補地の削除
     for (let a = 0; a < 8; a++) {
@@ -42,7 +43,7 @@ export default function Home() {
     }
 
     //置く
-    if (board[y][x] === 3 || board[y][x] === 0) {
+    if (board[y][x] === 0) {
       for (let i = 0; i < directions.length; i++) {
         const dy = directions[i][0];
         const dx = directions[i][1];
@@ -73,15 +74,7 @@ export default function Home() {
     }
 
     if (counter(1, board) + counter(2, board) !== counter(1, newBoard) + counter(2, newBoard)) {
-      //候補地差がし
-      for (let a = 0; a < 8; a++) {
-        for (let b = 0; b < 8; b++) {
-          if (canPut(a, b, newBoard, directions, nextTurnColor)) {
-            newBoard[a][b] = 3;
-          }
-        }
-      }
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /*終了、積み、パスの処理
       if (counter(3, newBoard) === 0) {
         //次の地点の候補地探し
         for (let a = 0; a < 8; a++) {
@@ -105,8 +98,7 @@ export default function Home() {
         }
         setBoard(newBoard);
         return;
-      }
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      } */
       setTurnColor(3 - turnColor);
       setBoard(newBoard);
     }
@@ -146,41 +138,6 @@ export default function Home() {
       </div>
     </div>
   );
-}
-
-//置けるかどうかを調べる関数
-function canPut(
-  y: number,
-  x: number,
-  board: number[][],
-  directions: number[][],
-  turnColor: number,
-) {
-  if (board[y][x] === 0 || board[y][x] === 3) {
-    for (let i = 0; i < directions.length; i++) {
-      const dy = directions[i][0];
-      const dx = directions[i][1];
-      if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
-        continue;
-      } else if (board[dy + y][dx + x] === 3 - turnColor) {
-        for (
-          let j = 2;
-          dy * j + y <= 7 &&
-          dy * j + y >= 0 &&
-          dx * j + x <= 7 &&
-          dx * j + x >= 0 &&
-          board[dy * j + y][dx * j + x] !== 0 &&
-          board[dy * j + y][dx * j + x] !== 3;
-          j++
-        ) {
-          if (board[dy * j + y][dx * j + x] === turnColor) {
-            return true;
-          }
-        }
-      }
-    }
-  }
-  return false;
 }
 
 //駒カウンター
