@@ -16,7 +16,6 @@ export default function Home() {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
-  const nextTurnColor = 3 - turnColor; //<= 次のターンカラー
 
   //統合ボード
   const calcBoard = structuredClone(board);
@@ -167,6 +166,18 @@ const putexpect = (board: number[][], turnColor: number): number[][] => {
     }
   }
   return ex;
+};
+
+//ボードの統合
+const integral = (newBoard: number[][], exBoard: number[][]): number[][] => {
+  for (let a = 0; a < newBoard.length; a++) {
+    for (let b = 0; b < newBoard[a].length; b++) {
+      if (exBoard[a][b] !== 3) {
+        exBoard[a][b] = newBoard[a][b];
+      }
+    }
+  }
+  return newBoard;
 };
 
 //駒カウンター
