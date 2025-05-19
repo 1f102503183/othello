@@ -16,19 +16,18 @@ export default function Home() {
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
+  const newBoard = structuredClone(board);
 
   //統合ボード
-  const calcBoard = structuredClone(board);
+  const calcBoard = integral(newBoard, putexpect(board, turnColor));
 
   const numberOfTurn = 60 - (counter(0, board) + counter(3, board)) + 1;
 
   const clickhandler = (x: number, y: number) => {
-    const newBoard = structuredClone(board);
     //置く
     if (board[y][x] === 0) {
       put(newBoard, y, x, turnColor);
     }
-
     if (counter(1, board) + counter(2, board) !== counter(1, newBoard) + counter(2, newBoard)) {
       /*終了、積み、パスの処理
       if (counter(3, newBoard) === 0) {
@@ -177,7 +176,7 @@ const integral = (newBoard: number[][], exBoard: number[][]): number[][] => {
       }
     }
   }
-  return newBoard;
+  return exBoard;
 };
 
 //駒カウンター
