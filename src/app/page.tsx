@@ -9,88 +9,28 @@ export default function Home() {
   const [board, setBoard] = useState([
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 3, 0, 0, 0],
-    [0, 0, 0, 1, 2, 3, 0, 0],
-    [0, 0, 3, 2, 1, 0, 0, 0],
-    [0, 0, 0, 3, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 2, 0, 0, 0],
+    [0, 0, 0, 2, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0],
   ]);
-  //ここから下がレンダー直後に実行される
-  const directions = [
-    [-1, -1],
-    [-1, 0],
-    [-1, 1],
-    [0, -1],
-    [0, 1],
-    [1, -1],
-    [1, 0],
-    [1, 1],
-  ];
+  const newBoard = structuredClone(board);
+
+  //統合ボード
+  const calcBoard = integral(newBoard, putexpect(board, turnColor));
 
   const numberOfTurn = 60 - (counter(0, board) + counter(3, board)) + 1;
 
   const clickhandler = (x: number, y: number) => {
-    const newBoard = structuredClone(board);
-    const nextTurnColor = 3 - turnColor;
-
-    //現在の候補地の削除
-    for (let a = 0; a < 8; a++) {
-      for (let b = 0; b < 8; b++) {
-        newBoard[a][b] %= 3;
-      }
-    }
-
     //置く
-    if (board[y][x] === 3 || board[y][x] === 0) {
-      for (let i = 0; i < directions.length; i++) {
-        const dy = directions[i][0];
-        const dx = directions[i][1];
-        if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
-          continue;
-        } else if (board[dy + y][dx + x] === 3 - turnColor) {
-          for (
-            let j = 2;
-            dy * j + y <= 7 &&
-            dy * j + y >= 0 &&
-            dx * j + x <= 7 &&
-            dx * j + x >= 0 &&
-            board[dy * j + y][dx * j + x] !== 0 &&
-            board[dy * j + y][dx * j + x] !== 3;
-            j++
-          ) {
-            if (board[dy * j + y][dx * j + x] === turnColor) {
-              //戻りながら裏返していく処理
-              newBoard[y][x] = turnColor;
-              for (let k = j; k > 0; k--) {
-                newBoard[dy * k + y][dx * k + x] = turnColor;
-              }
-              break;
-            }
-          }
-        }
-      }
+    if (board[y][x] === 0) {
+      put(newBoard, y, x, turnColor);
     }
-
     if (counter(1, board) + counter(2, board) !== counter(1, newBoard) + counter(2, newBoard)) {
-      //候補地差がし
-      for (let a = 0; a < 8; a++) {
-        for (let b = 0; b < 8; b++) {
-          if (canPut(a, b, newBoard, directions, nextTurnColor)) {
-            newBoard[a][b] = 3;
-          }
-        }
-      }
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      /*終了、積み、パスの処理
       if (counter(3, newBoard) === 0) {
-        //次の地点の候補地探し
-        for (let a = 0; a < 8; a++) {
-          for (let b = 0; b < 8; b++) {
-            if (canPut(a, b, newBoard, directions, turnColor)) {
-              newBoard[a][b] = 3;
-            }
-          }
-        }
         if (counter(3, newBoard) !== 0) {
           alert(nextTurnColor === 1 ? '黒は置けないためパスします' : '白は置けないためパスします');
         } else {
@@ -105,8 +45,7 @@ export default function Home() {
         }
         setBoard(newBoard);
         return;
-      }
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      } */
       setTurnColor(3 - turnColor);
       setBoard(newBoard);
     }
@@ -125,7 +64,7 @@ export default function Home() {
         black:{counter(1, board)} white:{counter(2, board)} {numberOfTurn}turn
       </div>
       <div className={styles.board}>
-        {board.map((row, y) =>
+        {calcBoard.map((row, y) =>
           row.map((color, x) => (
             <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickhandler(x, y)}>
               {color % 3 !== 0 && (
@@ -148,40 +87,97 @@ export default function Home() {
   );
 }
 
-//置けるかどうかを調べる関数
-function canPut(
-  y: number,
-  x: number,
-  board: number[][],
-  directions: number[][],
-  turnColor: number,
-) {
-  if (board[y][x] === 0 || board[y][x] === 3) {
-    for (let i = 0; i < directions.length; i++) {
-      const dy = directions[i][0];
-      const dx = directions[i][1];
-      if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
-        continue;
-      } else if (board[dy + y][dx + x] === 3 - turnColor) {
-        for (
-          let j = 2;
-          dy * j + y <= 7 &&
-          dy * j + y >= 0 &&
-          dx * j + x <= 7 &&
-          dx * j + x >= 0 &&
-          board[dy * j + y][dx * j + x] !== 0 &&
-          board[dy * j + y][dx * j + x] !== 3;
-          j++
-        ) {
-          if (board[dy * j + y][dx * j + x] === turnColor) {
-            return true;
+const put = (newBoard: number[][], y: number, x: number, turnColor: number) => {
+  const directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
+  for (let i = 0; i < directions.length; i++) {
+    const dy = directions[i][0];
+    const dx = directions[i][1];
+    if (dy + y > 7 || dy + y < 0 || dx + x > 7 || dx + x < 0) {
+      continue;
+    } else if (newBoard[dy + y][dx + x] === 3 - turnColor) {
+      for (
+        let j = 2;
+        dy * j + y <= 7 &&
+        dy * j + y >= 0 &&
+        dx * j + x <= 7 &&
+        dx * j + x >= 0 &&
+        newBoard[dy * j + y][dx * j + x] !== 0 &&
+        newBoard[dy * j + y][dx * j + x] !== 3;
+        j++
+      ) {
+        if (newBoard[dy * j + y][dx * j + x] === turnColor) {
+          //戻りながら裏返していく処理
+          newBoard[y][x] = turnColor;
+          for (let k = j; k > 0; k--) {
+            newBoard[dy * k + y][dx * k + x] = turnColor;
+          }
+          break;
+        }
+      }
+    }
+  }
+};
+
+const putexpect = (board: number[][], turnColor: number): number[][] => {
+  const directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+  ];
+  const ex = structuredClone(board);
+  //次の地点の候補地探し
+  for (let a = 0; a < 8; a++) {
+    for (let b = 0; b < 8; b++) {
+      for (let i = 0; i < directions.length; i++) {
+        const dy = directions[i][0];
+        const dx = directions[i][1];
+        if (dy + a > 7 || dy + a < 0 || dx + b > 7 || dx + b < 0) {
+          continue;
+        } else if (board[dy + a][dx + b] === 3 - turnColor) {
+          for (
+            let j = 2;
+            dy * j + a <= 7 &&
+            dy * j + a >= 0 &&
+            dx * j + b <= 7 &&
+            dx * j + b >= 0 &&
+            board[dy * j + a][dx * j + b] !== 0 &&
+            board[dy * j + a][dx * j + b] !== 3;
+            j++
+          ) {
+            ex[a][b] = 3;
           }
         }
       }
     }
   }
-  return false;
-}
+  return ex;
+};
+
+//ボードの統合
+const integral = (newBoard: number[][], exBoard: number[][]): number[][] => {
+  for (let a = 0; a < newBoard.length; a++) {
+    for (let b = 0; b < newBoard[a].length; b++) {
+      if (exBoard[a][b] !== 3) {
+        exBoard[a][b] = newBoard[a][b];
+      }
+    }
+  }
+  return exBoard;
+};
 
 //駒カウンター
 const counter = (c: number, board: number[][]) => {
