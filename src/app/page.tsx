@@ -185,6 +185,5 @@ function canPut(
 
 //駒カウンター
 const counter = (c: number, board: number[][]) => {
-  console.log(board);
   return board.flat().filter((i) => i === c).length;
 };
